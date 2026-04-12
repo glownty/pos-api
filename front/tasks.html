@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks</title>
+    <link rel="stylesheet" href="/tasks.css">
+</head>
+<body>
+<h1>Tasks</h1>
+
+<form id="taskForm">
+    <input type="text" name="title" placeholder="New Task" required>
+    <button type="submit">Add Task</button>
+</form>
+
+<ul id="tasksList"></ul>
+
+<script>
+    const token = localStorage.getItem('jwtToken');
+    if(!token){
+        alert('You must login first');
+        window.location.href = '/login.html';
+    }
+
+    const tasksList = document.getElementById('tasksList');
+    const taskForm = document.getElementById('taskForm');
+
+    async function fetchTasks(){
+        tasksList.innerHTML = '';
+        try {
+            const res = await fetch('/auth/tasks', {
+                method: 'GET',
+                headers: { 'Authorization': token }
+            });
+
+            if(!res.ok) throw new Error();
+
+            const tasks = await res.json();
+
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+
+                // Checkbox DONE
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.done;
+
+                checkbox.addEventListener('change', () => {
+                    toggleDone(task.id, checkbox.checked);
+                });
+
+                // Nome da task
+                const span = document.createElement('span');
+                span.textContent = task.title;
+                span.style.margin = '0 10px';
+
+                if(task.done){
+                    span.style.textDecoration = 'line-through';
+                }
+
+                // Botão RENOMEAR
+                const renameBtn = document.createElement('button');
+                renameBtn.textContent = 'Rename';
+
+                renameBtn.addEventListener('click', () => {
+                    const newName = prompt('New task name:');
+                    if(newName){
+                        renameTask(task.id, newName);
+                    }
+                });
+
+                // Botão DELETE
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'Delete';
+                delBtn.style.marginLeft = '5px';
+
+                delBtn.addEventListener('click', () => {
+                    deleteTask(task.id);
+                });
+
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                li.appendChild(renameBtn);
+                li.appendChild(delBtn);
+
+                tasksList.appendChild(li);
+            });
+
+        } catch(err){
+            console.error(err);
+            alert('Error fetching tasks');
+        }
+    }
+
+    // CREATE
+    taskForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+
+        const title = taskForm.title.value;
+
+        try {
+            const res = await fetch('/auth/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ title })
+            });
+
+            if(res.ok){
+                taskForm.reset();
+                fetchTasks();
+            } else {
+                const data = await res.json();
+                alert(data.msg || 'Error creating task');
+            }
+
+        } catch(err){
+            console.error(err);
+            alert('Network error');
+        }
+    });
+
+    // DELETE
+    async function deleteTask(task_id){
+        try {
+            const res = await fetch('/auth/tasks', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ task_id })
+            });
+
+            if(res.ok) fetchTasks();
+            else {
+                const data = await res.json();
+                alert(data.msg || 'Error deleting task');
+            }
+
+        } catch(err){
+            console.error(err);
+            alert('Network error');
+        }
+    }
+
+    // RENAME
+    async function renameTask(task_id, new_task_name){
+        try {
+            const res = await fetch('/auth/tasks/rename', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ task_id, new_task_name })
+            });
+
+            if(res.ok) fetchTasks();
+            else {
+                const data = await res.json();
+                alert(data.msg || 'Error renaming task');
+            }
+
+        } catch(err){
+            console.error(err);
+            alert('Network error');
+        }
+    }
+
+    // DONE
+    async function toggleDone(task_id, done){
+        try {
+            const res = await fetch('/auth/tasks/complete', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ task_id, done })
+            });
+
+            if(res.ok) fetchTasks();
+            else {
+                const data = await res.json();
+                alert(data.msg || 'Error updating task');
+            }
+
+        } catch(err){
+            console.error(err);
+            alert('Network error');
+        }
+    }
+
+    fetchTasks();
+</script>
+</body>
+</html>
