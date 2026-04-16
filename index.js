@@ -1,18 +1,25 @@
-// server.js
 const express = require('express');
+const path = require('path');
+
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productsRoutes');
 const salesRoutes = require('./routes/salesRoutes');
-
-
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// FRONTEND
+app.use(express.static(path.join(__dirname, 'front')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'front', 'index.html'));
+});
+
+// API
 app.use('/auth', authRoutes);
-app.use('/products',productRoutes);
+app.use('/products', productRoutes);
 app.use('/sales', salesRoutes);
 
 const PORT = process.env.PORT || 3000;

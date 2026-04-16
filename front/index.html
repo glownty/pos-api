@@ -2,115 +2,190 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDV Master - Vanilla JS</title>
+    <title>PDV System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        /* Classes utilitárias para esconder/mostrar telas */
         .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans h-screen overflow-hidden">
 
-<div id="authView" class="h-screen flex flex-col items-center justify-center bg-gray-200">
-    <div class="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 id="authTitle" class="text-2xl font-bold mb-6 text-center text-gray-800">Login do PDV</h2>
-        <form id="authForm" class="space-y-4">
-            <input type="text" id="username" placeholder="Username" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            <input type="password" id="password" placeholder="Password" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            <button type="submit" id="authBtn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition font-bold">Entrar</button>
+<body class="bg-gray-900 text-white h-screen overflow-hidden">
+
+<!-- LOGIN -->
+<div id="authView" class="h-screen flex items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded w-96">
+
+        <h2 class="text-xl font-bold mb-4" id="authTitle">Login</h2>
+
+        <form id="authForm" class="space-y-2">
+            <input id="username" class="w-full p-2 bg-gray-700" placeholder="usuário">
+            <input id="password" type="password" class="w-full p-2 bg-gray-700" placeholder="senha">
+
+            <button class="bg-blue-600 w-full p-2">Entrar</button>
         </form>
-        <p id="toggleAuth" class="mt-4 text-center text-sm text-gray-600 cursor-pointer hover:underline">
-            Não tem conta? Registre-se
+
+        <p id="toggleAuth" class="text-center mt-3 cursor-pointer text-gray-300">
+            Registrar
         </p>
+
     </div>
 </div>
 
-<div id="appView" class="hidden h-screen flex">
-    <div class="w-64 bg-gray-900 text-white flex flex-col">
-        <div class="p-6 text-2xl font-bold border-b border-gray-800">PDV Master</div>
-        <nav class="flex-1 p-4 space-y-2">
-            <button onclick="navigate('pdvView')" class="w-full text-left p-3 rounded transition hover:bg-gray-800 focus:bg-gray-800">🛒 Novo Pedido</button>
-            <button onclick="navigate('salesView')" class="w-full text-left p-3 rounded transition hover:bg-gray-800 focus:bg-gray-800">📊 Histórico de Vendas</button>
-            <button onclick="navigate('productsView')" class="w-full text-left p-3 rounded transition hover:bg-gray-800 focus:bg-gray-800">📦 Produtos</button>
-        </nav>
-        <button onclick="logout()" class="p-4 bg-red-600 hover:bg-red-700 m-4 rounded font-bold">Sair</button>
+<!-- APP -->
+<div id="appView" class="hidden flex h-screen">
+
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-gray-950 p-4 space-y-2">
+
+        <button onclick="navigate('products')" class="w-full text-left p-2 bg-gray-800">
+            📦 Produtos
+        </button>
+
+        <button onclick="navigate('pdv')" class="w-full text-left p-2 bg-gray-800">
+            🛒 PDV
+        </button>
+
+        <button onclick="navigate('sales')" class="w-full text-left p-2 bg-gray-800">
+            💰 Vendas
+        </button>
+
+        <button onclick="logout()" class="bg-red-600 w-full p-2 mt-4">
+            Sair
+        </button>
+
     </div>
 
-    <div class="flex-1 overflow-y-auto p-6 bg-gray-100">
+    <!-- CONTENT -->
+    <div class="flex-1 p-4 overflow-auto">
 
-        <div id="productsView" class="hidden">
-            <h2 class="text-2xl font-bold mb-4">Gerenciar Produtos</h2>
-            <form id="productForm" class="bg-white p-4 rounded shadow mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <input type="hidden" id="prodId">
-                <input type="text" id="prodName" placeholder="Nome" class="border p-2 rounded" required>
-                <input type="text" id="prodBarcode" placeholder="Código de Barras" class="border p-2 rounded">
-                <input type="number" id="prodPrice" step="0.01" placeholder="Preço de Venda" class="border p-2 rounded" required>
-                <input type="number" id="prodStock" placeholder="Estoque" class="border p-2 rounded" required>
-                <button type="submit" id="prodSubmitBtn" class="col-span-full bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold">Adicionar Produto</button>
-                <button type="button" id="prodCancelBtn" onclick="resetProductForm()" class="hidden col-span-full bg-gray-500 text-white p-2 rounded hover:bg-gray-600 font-bold">Cancelar Edição</button>
-            </form>
-
-            <div class="bg-white rounded shadow overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-3 border-b">Nome</th>
-                        <th class="p-3 border-b">Cód. Barras</th>
-                        <th class="p-3 border-b">Preço</th>
-                        <th class="p-3 border-b">Estoque</th>
-                        <th class="p-3 border-b">Ações</th>
-                    </tr>
-                    </thead>
-                    <tbody id="productsTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="pdvView" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <h2 class="text-2xl font-bold mb-4">Novo Pedido</h2>
-                <div id="pdvProductsList" class="grid grid-cols-2 gap-4">
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded shadow flex flex-col max-h-[85vh]">
-                <h3 class="text-xl font-bold mb-4 border-b pb-2">Carrinho</h3>
-                <div id="cartItems" class="flex-1 overflow-y-auto">
-                </div>
-                <div class="border-t pt-4 mt-4 text-right space-y-2">
-                    <p class="text-gray-600">Subtotal: R$ <span id="cartSubtotal">0.00</span></p>
-                    <p class="text-xl font-bold text-green-600">Total: R$ <span id="cartTotal">0.00</span></p>
-                    <button onclick="checkout()" class="w-full mt-4 bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">
-                        Finalizar Venda (PIX)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="salesView" class="hidden">
-            <h2 class="text-2xl font-bold mb-4">Histórico de Vendas</h2>
-            <div class="bg-white rounded shadow overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-3 border-b">ID</th>
-                        <th class="p-3 border-b">Total</th>
-                        <th class="p-3 border-b">Método</th>
-                        <th class="p-3 border-b">Status</th>
-                        <th class="p-3 border-b">Ações</th>
-                    </tr>
-                    </thead>
-                    <tbody id="salesTableBody">
-                    </tbody>
-                </table>
-            </div>
+        <div id="viewContainer">
+            <!-- JS vai renderizar aqui -->
         </div>
 
     </div>
 </div>
 
+<!-- SCRIPTS -->
+<script src="auth.js"></script>
+<script src="products.js"></script>
+<script src="pdv.js"></script>
+<script src="sales.js"></script>
 <script src="app.js"></script>
+
+<!-- MODAL CRIAR PRODUTO -->
+<div id="createProductModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+    <div class="bg-gray-800 w-[420px] p-6 rounded-lg shadow-lg">
+
+        <h2 class="text-xl font-bold mb-4">Novo Produto</h2>
+
+        <div class="space-y-3">
+
+            <input id="cp_name"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Nome do produto">
+
+            <input id="cp_barcode"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Código de barras (opcional)">
+
+            <input id="cp_price" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Preço de venda (R$)">
+
+            <input id="cp_cost" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Custo (R$)">
+
+            <input id="cp_stock" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Estoque">
+
+            <input id="cp_category"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="ID da categoria (opcional)">
+
+            <select id="cp_active"
+                    class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="1">Ativo</option>
+                <option value="0">Inativo</option>
+            </select>
+
+        </div>
+
+        <div class="flex justify-between mt-5">
+            <button onclick="closeCreateProductModal()"
+                    class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500">
+                Cancelar
+            </button>
+
+            <button onclick="submitCreateProduct()"
+                    class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">
+                Salvar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL EDITAR PRODUTO -->
+<div id="editProductModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+    <div class="bg-gray-800 w-[420px] p-6 rounded-lg shadow-lg">
+
+        <h2 class="text-xl font-bold mb-4">Editar Produto</h2>
+
+        <input id="ep_id" type="hidden">
+
+        <div class="space-y-3">
+
+            <input id="ep_name"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Nome do produto">
+
+            <input id="ep_barcode"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Código de barras">
+
+            <input id="ep_price" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Preço de venda (R$)">
+
+            <input id="ep_cost" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Custo (R$)">
+
+            <input id="ep_stock" type="number"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Estoque">
+
+            <input id="ep_category"
+                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="ID da categoria">
+
+            <select id="ep_active"
+                    class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="1">Ativo</option>
+                <option value="0">Inativo</option>
+            </select>
+
+        </div>
+
+        <div class="flex justify-between mt-5">
+            <button onclick="closeEditProductModal()"
+                    class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500">
+                Cancelar
+            </button>
+
+            <button onclick="submitEditProduct()"
+                    class="px-4 py-2 bg-green-600 rounded hover:bg-green-500">
+                Atualizar
+            </button>
+        </div>
+
+    </div>
+</div>
+
 </body>
 </html>

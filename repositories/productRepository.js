@@ -22,6 +22,7 @@ exports.updateProduct = async (id, userId, name, barcode, price, cost, stock, ca
     );
 }
 exports.deleteProduct = async (id, userId) => {
+    console.log("🧨 DELETE PARAMS:", { id, userId });
     await db.execute(`DELETE FROM products WHERE id = ? AND userId = ?`, [id, userId]);
     return {msg: 'Deleted product'};
 }
@@ -30,10 +31,20 @@ exports.getAllProducts = async (userId) => {
     return rows;
 }
 exports.getProductByBarcode = async (barcode, userId)=>{
-    const [rows] = await db.execute('select * from products where barcode = ? AND userId = ?', [barcode, userId]);
+    const [rows] = await db.execute(
+        'select * from products where userId = ? and barcode = ?',
+        [userId, barcode]);
     return rows;
 }
 exports.getProductById = async (id, userId) => {
-    const [rows] = await db.execute('select * from products where id = ? AND userId = ?', [id, userId]);
+    const [rows] = await db.execute(
+        'select * from products where id = ? AND userId = ?',
+        [id, userId]);
+    return rows;
+}
+exports.getProductByName = async (name, userId) => {
+    const [rows] = await db.execute(
+        'select * from products where userId  = ? and name like ? order by name like ? desc, name asc',
+        [userId, `%${name}%`, `${name}%`]);
     return rows;
 }
