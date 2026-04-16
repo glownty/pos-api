@@ -1,99 +1,132 @@
-﻿JWT-Auth-Tasks-API
+POS API (Node.js + MySQL)
 
-A simple Node.js API with JWT authentication for user registration and login, plus protected routes to manage tasks (create, read, update, delete). Includes a basic front-end (HTML/CSS/JS) for testing.
+DESCRIPTION
+-----------
+This project is a Point of Sale (POS) API built with Node.js and MySQL.
 
-Features
+It focuses on a layered architecture (Controller, Service, Repository) and includes authentication, product management, and sales processing with multiple items per sale.
 
-* User registration with hashed passwords (bcrypt)
-* User login with JWT token generation
-* Protected routes using JWT authentication
-* Create, list, delete, rename and complete tasks
-* Tasks are linked to individual users
-* Simple front-end to test the API
+The authentication system was developed in a separate project and integrated here.
 
-Technologies
+---
 
-* Node.js
-* Express
-* MySQL
-* bcrypt
-* JSON Web Tokens (JWT)
+TECHNOLOGIES
+-------------
+- Node.js
+- Express
+- MySQL (mysql2)
+- JWT (authentication)
+- bcrypt (password hashing)
 
-Setup
+---
 
-1. Clone the repository:
+ARCHITECTURE
+-------------
+- controllers → handle HTTP requests
+- services → business logic
+- repositories → database queries
+- middlewares → authentication and rate limiting
 
-git clone <your-repo-url>
-cd <repo-folder>
+---
 
-2. Install dependencies:
+AUTHENTICATION
+--------------
+JWT-based authentication system.
 
-npm install
+Endpoints:
+- POST /auth/register
+- POST /auth/login
 
-3. Import the local database dump:
+Note: Authentication was implemented in a separate project and reused here.
 
-* Make sure MySQL is installed locally
-* Create an empty database (name must match .env):
+---
 
-CREATE DATABASE finaldb;
+PRODUCTS
+--------
 
-* Import the dump file:
+Create product:
+POST /products (requires token)
 
-mysql -u root -p finaldb < finaldb_dump.sql
+Body:
+{
+  "name": "Product",
+  "barcode": "123",
+  "price": 10,
+  "cost": 5,
+  "stock": 20,
+  "categoryId": 1,
+  "isActive": true
+}
 
-4. Create a .env file with your environment variables:
+Get all products:
+GET /products (requires token)
 
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1h
+---
+
+SALES
+-----
+
+Create sale:
+POST /sales (requires token)
+
+Body:
+{
+  "subtotal": 100,
+  "discount": 10,
+  "total": 90,
+  "paymentMethod": "PIX",
+  "status": "PAID",
+  "products": [
+    { "id": 1, "quantity": 2 },
+    { "id": 2, "quantity": 1 }
+  ]
+}
+
+Note: The "products" array is used internally to generate sale items (saleItens). These are automatically created by the backend and are NOT sent separately by the client.
+
+Get all sales:
+GET /sales/:userId
+
+Get sale by ID:
+GET /sales/:userId/:id
+
+Update sale:
+PUT /sales/:userId/:id
+
+Delete sale:
+DELETE /sales/:userId/:id
+
+---
+
+CONFIGURATION
+-------------
+Create a .env file:
+
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=yourpassword
-DB_NAME=finaldb
+DB_PASSWORD=your_password
+DB_DATABASE=pdv
+JWT_SECRET=your_secret
+JWT_EXPIRES_IN=1d
 
-5. Run the server:
+---
 
+RUNNING THE PROJECT
+-------------------
+Install dependencies:
+npm install
+
+Start server:
 node index.js
 
-API Endpoints
+---
 
-Auth
+PROJECT GOAL
+------------
+This project was built for learning purposes, focusing on:
 
-* POST /auth/register
-  Register a new user
-  Body: { "username": "user", "password": "pass" }
-
-* POST /auth/login
-  Login and get a JWT token
-  Body: { "username": "user", "password": "pass" }
-
-Tasks (Protected)
-
-All routes below require:
-Headers: Authorization: <token>
-
-* POST /auth/tasks
-  Create a new task
-  Body: { "title": "Task title", "done": false }
-
-* GET /auth/tasks
-  Get all tasks of the logged-in user
-
-* DELETE /auth/tasks
-  Delete a task
-  Body: { "task_id": 1 }
-
-* PUT /auth/tasks/rename
-  Rename a task
-  Body: { "task_id": 1, "new_task_name": "New name" }
-
-* PUT /auth/tasks/complete
-  Mark task as done or not done
-  Body: { "task_id": 1, "done": true }
-
-Notes
-
-* Store the JWT token in the client (localStorage, sessionStorage, or cookies) to access protected routes.
-* The Authorization header must contain the token returned on login.
-* Tasks are always linked to the authenticated user.
-* The database is local and contains dummy data for testing.
-* The project includes a simple front-end located in the "front" folder.
+- Layered architecture
+- REST API design
+- JWT authentication
+- MySQL integration
+- Sales system with multiple items (saleItens)
