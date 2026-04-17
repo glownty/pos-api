@@ -1,7 +1,7 @@
 const salesService = require('../services/salesService');
 
 exports.getAllSales = async (req, res) => {
-    const { userId } = req.user.id;
+    const userId  = req.user.id;
 
     try {
         return res.json(await salesService.getAllSales(userId));
@@ -23,29 +23,36 @@ exports.getSaleById = async (req, res) => {
 
 exports.createSale = async (req, res) => {
     const {
-        userId,
         subtotal,
         discount,
-        total,
         paymentMethod,
         status,
         products
     } = req.body;
-
+    const userId = req.user.id;
     try {
         const result = await salesService.createSale(
             userId,
             subtotal,
-            discount,
-            total,
-            paymentMethod,
-            status,
+            discount || 0,
+            subtotal - discount,
+            paymentMethod || "cash",
+            status || "completed",
             products
         );
 
         return res.json(result);
     } catch (err) {
-        return res.status(500).json({ msg: err.message });
+        console.error("🔥 SALES ERROR FULL:");
+        console.error(err);
+        console.error("STACK:");
+        console.error(err.stack);
+
+        return res.status(500).json({
+            message: err.message,
+            name: err.name,
+            stack: process.env.NODE_ENV === "development" ? err.stack : undefined
+        });
     }
 };
 

@@ -40,7 +40,7 @@ exports.getProductById = async (id, userId) => {
     const [rows] = await db.execute(
         'select * from products where id = ? AND userId = ?',
         [id, userId]);
-    return rows;
+    return rows[0];
 }
 exports.getProductByName = async (name, userId) => {
     const [rows] = await db.execute(

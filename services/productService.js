@@ -25,6 +25,9 @@ exports.createProduct = async (data) => {
 exports.getAllProducts = async (userId) => {
     return productRepo.getAllProducts(userId);
 }
+exports.getProductById = async (id, userId) => {
+    return productRepo.getProductById(id, userId);
+}
 exports.getProductByBarcode = async (barcode, userId) => {
     return productRepo.getProductByBarcode(barcode, userId);
 }

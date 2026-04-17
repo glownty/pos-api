@@ -2,10 +2,12 @@
 
 let token = localStorage.getItem("token");
 
-// estado global simples
-let state = {
+// =======================
+// STATE GLOBAL
+// =======================
+window.state = {
     products: [],
-    cart: [],
+    pdvProducts: [],
     sales: []
 };
 
@@ -20,7 +22,29 @@ function headers() {
 }
 
 // =======================
-// NAVIGATION (SPA SIMPLES)
+// SIDEBAR
+// =======================
+let sidebarOpen = false;
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const menu = document.getElementById("menuItems");
+
+    sidebarOpen = !sidebarOpen;
+
+    if (sidebarOpen) {
+        sidebar.classList.remove("w-16");
+        sidebar.classList.add("w-64");
+        menu.classList.remove("hidden");
+    } else {
+        sidebar.classList.remove("w-64");
+        sidebar.classList.add("w-16");
+        menu.classList.add("hidden");
+    }
+}
+
+// =======================
+// NAVIGATION
 // =======================
 function navigate(view) {
     const container = document.getElementById("viewContainer");
@@ -32,7 +56,7 @@ function navigate(view) {
 
     if (view === "pdv") {
         container.innerHTML = renderPDVView();
-        if (window.loadPDV) loadPDV();
+        if (window.loadPDVProducts) loadPDVProducts();
     }
 
     if (view === "sales") {
@@ -49,7 +73,11 @@ function checkAuth() {
         document.getElementById("authView").classList.add("hidden");
         document.getElementById("appView").classList.remove("hidden");
 
-        navigate("products");
+        // inicia no PDV
+        navigate("pdv");
+
+        // fecha sidebar depois que renderizar
+        setTimeout(() => toggleSidebar(), 0);
     }
 }
 
@@ -61,5 +89,14 @@ function logout() {
     location.reload();
 }
 
-// init
+// =======================
+// INIT
+// =======================
 document.addEventListener("DOMContentLoaded", checkAuth);
+
+// =======================
+// EXPORT
+// =======================
+window.navigate = navigate;
+window.toggleSidebar = toggleSidebar;
+window.logout = logout;

@@ -43,6 +43,20 @@ exports.getProductByName = async (req,res) => {
     }
 }
 
+exports.getProductById = async (req,res) => {
+    const id = req.params.id
+    const userId = req.user.id;
+    try{
+        const result = await productService.getProductById(id, userId);
+        return res.json(result)
+    }catch (err) {
+        console.error("search product error:", err);
+        return res.status(500).json({
+            msg: "Server error",
+            error: err.message
+        });
+    }
+}
 exports.createProduct = async (req, res) => {
     const {
         name, barcode, price, cost, stock, categoryId, isActive,

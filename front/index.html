@@ -36,42 +36,48 @@
 <div id="appView" class="hidden flex h-screen">
 
     <!-- SIDEBAR -->
-    <div class="w-64 bg-gray-950 p-4 space-y-2">
+    <div id="sidebar" class="w-16 bg-gray-950 p-4 space-y-2 transition-all duration-300">
 
-        <button onclick="navigate('products')" class="w-full text-left p-2 bg-gray-800">
-            📦 Produtos
+        <button onclick="toggleSidebar()" class="mb-4 bg-gray-800 w-full p-2">
+            ☰
         </button>
 
-        <button onclick="navigate('pdv')" class="w-full text-left p-2 bg-gray-800">
-            🛒 PDV
-        </button>
+        <!-- COMEÇA ESCONDIDO -->
+        <div id="menuItems" class="hidden">
+            <button onclick="navigate('products')" class="w-full text-left p-2 bg-gray-800">
+                📦 Produtos
+            </button>
 
-        <button onclick="navigate('sales')" class="w-full text-left p-2 bg-gray-800">
-            💰 Vendas
-        </button>
+            <button onclick="navigate('pdv')" class="w-full text-left p-2 bg-gray-800">
+                🛒 PDV
+            </button>
 
-        <button onclick="logout()" class="bg-red-600 w-full p-2 mt-4">
-            Sair
-        </button>
+            <button onclick="navigate('sales')" class="w-full text-left p-2 bg-gray-800">
+                💰 Vendas
+            </button>
+
+            <button onclick="logout()" class="bg-red-600 w-full p-2 mt-4">
+                Sair
+            </button>
+        </div>
 
     </div>
 
     <!-- CONTENT -->
     <div class="flex-1 p-4 overflow-auto">
-
         <div id="viewContainer">
             <!-- JS vai renderizar aqui -->
         </div>
-
     </div>
+
 </div>
 
-<!-- SCRIPTS -->
+<!-- SCRIPTS (ORDEM IMPORTA) -->
+<script src="app.js"></script>
 <script src="auth.js"></script>
 <script src="products.js"></script>
 <script src="pdv.js"></script>
 <script src="sales.js"></script>
-<script src="app.js"></script>
 
 <!-- MODAL CRIAR PRODUTO -->
 <div id="createProductModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
@@ -82,32 +88,14 @@
 
         <div class="space-y-3">
 
-            <input id="cp_name"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Nome do produto">
+            <input id="cp_name" class="w-full p-2 bg-gray-700 rounded" placeholder="Nome do produto">
+            <input id="cp_barcode" class="w-full p-2 bg-gray-700 rounded" placeholder="Código de barras">
+            <input id="cp_price" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Preço">
+            <input id="cp_cost" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Custo">
+            <input id="cp_stock" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Estoque">
+            <input id="cp_category" class="w-full p-2 bg-gray-700 rounded" placeholder="Categoria">
 
-            <input id="cp_barcode"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Código de barras (opcional)">
-
-            <input id="cp_price" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Preço de venda (R$)">
-
-            <input id="cp_cost" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Custo (R$)">
-
-            <input id="cp_stock" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Estoque">
-
-            <input id="cp_category"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="ID da categoria (opcional)">
-
-            <select id="cp_active"
-                    class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="cp_active" class="w-full p-2 bg-gray-700 rounded">
                 <option value="1">Ativo</option>
                 <option value="0">Inativo</option>
             </select>
@@ -115,13 +103,11 @@
         </div>
 
         <div class="flex justify-between mt-5">
-            <button onclick="closeCreateProductModal()"
-                    class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500">
+            <button onclick="closeCreateProductModal()" class="px-4 py-2 bg-gray-600 rounded">
                 Cancelar
             </button>
 
-            <button onclick="submitCreateProduct()"
-                    class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">
+            <button onclick="submitCreateProduct()" class="px-4 py-2 bg-blue-600 rounded">
                 Salvar
             </button>
         </div>
@@ -140,32 +126,14 @@
 
         <div class="space-y-3">
 
-            <input id="ep_name"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Nome do produto">
+            <input id="ep_name" class="w-full p-2 bg-gray-700 rounded" placeholder="Nome">
+            <input id="ep_barcode" class="w-full p-2 bg-gray-700 rounded" placeholder="Código">
+            <input id="ep_price" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Preço">
+            <input id="ep_cost" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Custo">
+            <input id="ep_stock" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Estoque">
+            <input id="ep_category" class="w-full p-2 bg-gray-700 rounded" placeholder="Categoria">
 
-            <input id="ep_barcode"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Código de barras">
-
-            <input id="ep_price" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Preço de venda (R$)">
-
-            <input id="ep_cost" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Custo (R$)">
-
-            <input id="ep_stock" type="number"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Estoque">
-
-            <input id="ep_category"
-                   class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="ID da categoria">
-
-            <select id="ep_active"
-                    class="w-full p-2 bg-gray-700 rounded outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="ep_active" class="w-full p-2 bg-gray-700 rounded">
                 <option value="1">Ativo</option>
                 <option value="0">Inativo</option>
             </select>
@@ -173,13 +141,11 @@
         </div>
 
         <div class="flex justify-between mt-5">
-            <button onclick="closeEditProductModal()"
-                    class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500">
+            <button onclick="closeEditProductModal()" class="px-4 py-2 bg-gray-600 rounded">
                 Cancelar
             </button>
 
-            <button onclick="submitEditProduct()"
-                    class="px-4 py-2 bg-green-600 rounded hover:bg-green-500">
+            <button onclick="submitEditProduct()" class="px-4 py-2 bg-green-600 rounded">
                 Atualizar
             </button>
         </div>
