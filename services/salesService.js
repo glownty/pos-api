@@ -41,6 +41,7 @@ exports.getAllSales = async (userId) => {
 };
 
 exports.getSaleById = async (id, userId) => {
+
     const sale = await salesRepo.getSaleById(id, userId);
 
     if (!sale) {

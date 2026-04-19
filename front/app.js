@@ -49,6 +49,11 @@ function toggleSidebar() {
 function navigate(view) {
     const container = document.getElementById("viewContainer");
 
+    if (view === "home") {
+        container.innerHTML = renderHomeView();
+        if (window.loadHome) loadHome();
+    }
+
     if (view === "products") {
         container.innerHTML = renderProductsView();
         if (window.loadProducts) loadProducts();
@@ -73,8 +78,8 @@ function checkAuth() {
         document.getElementById("authView").classList.add("hidden");
         document.getElementById("appView").classList.remove("hidden");
 
-        // inicia no PDV
-        navigate("pdv");
+        // inicia na HOME
+        navigate("home");
 
         // fecha sidebar depois que renderizar
         setTimeout(() => toggleSidebar(), 0);

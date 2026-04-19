@@ -35,33 +35,6 @@
 <!-- APP -->
 <div id="appView" class="hidden flex h-screen">
 
-    <!-- SIDEBAR -->
-    <div id="sidebar" class="w-16 bg-gray-950 p-4 space-y-2 transition-all duration-300">
-
-        <button onclick="toggleSidebar()" class="mb-4 bg-gray-800 w-full p-2">
-            ☰
-        </button>
-
-        <!-- COMEÇA ESCONDIDO -->
-        <div id="menuItems" class="hidden">
-            <button onclick="navigate('products')" class="w-full text-left p-2 bg-gray-800">
-                📦 Produtos
-            </button>
-
-            <button onclick="navigate('pdv')" class="w-full text-left p-2 bg-gray-800">
-                🛒 PDV
-            </button>
-
-            <button onclick="navigate('sales')" class="w-full text-left p-2 bg-gray-800">
-                💰 Vendas
-            </button>
-
-            <button onclick="logout()" class="bg-red-600 w-full p-2 mt-4">
-                Sair
-            </button>
-        </div>
-
-    </div>
 
     <!-- CONTENT -->
     <div class="flex-1 p-4 overflow-auto">
@@ -73,6 +46,7 @@
 </div>
 
 <!-- SCRIPTS (ORDEM IMPORTA) -->
+<script src="home.js"></script>
 <script src="app.js"></script>
 <script src="auth.js"></script>
 <script src="products.js"></script>

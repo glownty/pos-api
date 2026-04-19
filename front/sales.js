@@ -2,6 +2,7 @@
 // STATE SAFE
 // =======================
 if (!state.sales) state.sales = [];
+if (!state.selectedSale) state.selectedSale = null;
 
 // =======================
 // VIEW
@@ -13,16 +14,29 @@ function renderSalesView() {
         <div class="flex gap-2 mb-4">
             <input id="salesSearchInput"
                 oninput="handleSalesSearchInput()"
-                class="flex-1 p-2 bg-gray-800 rounded"
-                placeholder="Buscar venda...">
+                class="flex-1 p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Buscar venda por ID...">
         </div>
 
         <div id="salesList" class="space-y-2"></div>
+
+        <!-- MODAL DETALHE VENDA -->
+        <div id="saleModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+            <div class="bg-gray-900 w-full max-w-md p-4 rounded">
+
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold">Detalhe da Venda</h2>
+                    <button onclick="closeSaleModal()" class="text-red-500">X</button>
+                </div>
+
+                <div id="saleModalContent"></div>
+            </div>
+        </div>
     `;
 }
 
 // =======================
-// LOAD SALES (USER SCOPED)
+// LOAD SALES
 // =======================
 async function loadSales() {
     try {
@@ -39,6 +53,7 @@ async function loadSales() {
     } catch (err) {
         console.error("LOAD SALES ERROR:", err);
         state.sales = [];
+        renderSalesList([]);
     }
 }
 
@@ -47,24 +62,37 @@ async function loadSales() {
 // =======================
 function renderSalesList(list = state.sales) {
     const el = document.getElementById("salesList");
-    const safeList = list || [];
 
-    if (!safeList.length) {
+    if (!list || !list.length) {
         el.innerHTML = `<div class="text-gray-400">Nenhuma venda encontrada</div>`;
         return;
     }
 
-    el.innerHTML = safeList.map(s => `
-        <div class="bg-gray-800 p-3 flex justify-between">
+    el.innerHTML = list.map(s => `
+        <div class="bg-gray-800 p-3 flex justify-between items-center rounded cursor-pointer"
+             onclick="openSale(${s.id})">
+
             <div>
                 <div class="font-bold">Venda #${s.id}</div>
+
                 <div class="text-sm text-gray-400">
-                    Total: R$ ${(s.total ?? 0).toFixed(2)}
+                    Total: R$ ${Number(s.total || 0).toFixed(2)}
+                </div>
+
+                <div class="text-sm text-yellow-400">
+                    Status: ${s.status || 'pendente'}
+                </div>
+
+                <div class="text-xs text-gray-500 mt-1">
+                    ${(s.items || [])
+        .slice(0, 3)
+        .map(i => i.productName || 'item')
+        .join(', ')}
                 </div>
             </div>
 
-            <button onclick="deleteSale(${s.id})"
-                class="bg-red-600 px-2">
+            <button onclick="deleteSale(${s.id}); event.stopPropagation();"
+                class="bg-red-600 px-2 rounded">
                 Del
             </button>
         </div>
@@ -72,7 +100,7 @@ function renderSalesList(list = state.sales) {
 }
 
 // =======================
-// SEARCH (LOCAL)
+// SEARCH
 // =======================
 let salesTimeout;
 
@@ -84,7 +112,7 @@ function handleSalesSearchInput() {
 
         if (!value) return renderSalesList();
 
-        const filtered = (state.sales || []).filter(s =>
+        const filtered = state.sales.filter(s =>
             String(s.id).includes(value)
         );
 
@@ -93,7 +121,75 @@ function handleSalesSearchInput() {
 }
 
 // =======================
-// DELETE SALE
+// OPEN SALE
+// =======================
+async function openSale(id) {
+    try {
+        const res = await fetch(BASE_URL + "/sales/" + id, {
+            headers: headers()
+        });
+
+        const sale = await res.json();
+
+        state.selectedSale = sale;
+
+        renderSaleModal(sale);
+
+    } catch (err) {
+        console.error("OPEN SALE ERROR:", err);
+    }
+}
+
+// =======================
+// MODAL
+// =======================
+function renderSaleModal(s) {
+    const el = document.getElementById("saleModalContent");
+
+    el.innerHTML = `
+        <div class="space-y-2 text-sm">
+
+            <div class="font-bold text-lg">
+                Venda #${s.id}
+            </div>
+
+            <div>Status: <span class="text-yellow-400">${s.status || 'pendente'}</span></div>
+
+            <div>Pagamento: ${s.paymentMethod || 'N/A'}</div>
+
+            <div class="border-t border-gray-700 my-2"></div>
+
+            <div class="space-y-1">
+                ${(s.items || []).map(i => `
+                    <div class="flex justify-between text-gray-300">
+                        <span>${i.productName}</span>
+                        <span>x${i.quantity}</span>
+                        <span>R$ ${(i.quantity * i.price).toFixed(2)}</span>
+                    </div>
+                `).join("")}
+            </div>
+
+            <div class="border-t border-gray-700 my-2"></div>
+
+            <div class="text-right font-bold">
+                Total: R$ ${Number(s.total || 0).toFixed(2)}
+            </div>
+
+        </div>
+    `;
+
+    document.getElementById("saleModal").classList.remove("hidden");
+}
+
+// =======================
+// CLOSE MODAL
+// =======================
+function closeSaleModal() {
+    document.getElementById("saleModal").classList.add("hidden");
+}
+
+// =======================
+// DELETE
 // =======================
 async function deleteSale(id) {
     try {
@@ -115,3 +211,6 @@ async function deleteSale(id) {
 window.renderSalesView = renderSalesView;
 window.loadSales = loadSales;
 window.deleteSale = deleteSale;
+window.openSale = openSale;
+window.handleSalesSearchInput = handleSalesSearchInput;
+window.closeSaleModal = closeSaleModal;

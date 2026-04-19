@@ -11,7 +11,8 @@ exports.getAllSales = async (req, res) => {
 };
 
 exports.getSaleById = async (req, res) => {
-    const { id, userId } = req.params;
+    const { id } = req.params;
+    const userId = req.user.id;
 
     try {
         const sale = await salesService.getSaleById(id, userId);

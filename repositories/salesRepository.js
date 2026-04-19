@@ -26,24 +26,59 @@ exports.updateSale = async (id, userId, subtotal, discount, total, paymentMethod
 exports.deleteSale = async (id, userId)=>{
     await db.execute('DELETE FROM sales WHERE id = ? AND userId = ?', [id, userId]);
 }
-exports.getAllSales = async (userId)=>{
-    const [rows] = await db.execute('SELECT * FROM sales WHERE userId = ?', [userId]);
-    return rows;
-}
-exports.getSaleById = async (id, userId)=>{
-    const [rows] = await db.execute(
+exports.getAllSales = async (userId) => {
+    const [sales] = await db.execute(
+        'SELECT * FROM sales WHERE userId = ?',
+        [userId]
+    );
+
+    const result = await Promise.all(
+        sales.map(async (sale) => {
+            const [items] = await db.execute(`
+                SELECT 
+                    si.productId,
+                    si.quantity,
+                    si.price,
+                    p.name AS productName
+                FROM saleitens si
+                JOIN products p ON p.id = si.productId
+                WHERE si.saleId = ?
+            `, [sale.id]);
+
+            return {
+                ...sale,
+                items: items
+            };
+        })
+    );
+
+    return result;
+};
+exports.getSaleById = async (id, userId) => {
+
+    const [saleRows] = await db.execute(
         'SELECT * FROM sales WHERE id = ? AND userId = ?',
-        [id, userId]);
-    const sale = rows[0];
+        [id, userId]
+    );
+
+    const sale = saleRows[0];
+
     if (!sale) return null;
 
-    const [items] = await db.execute(
-        'SELECT * FROM saleItens WHERE saleId = ?',
-        [id]
-    );
+    const [items] = await db.execute(`
+        SELECT
+            si.productId,
+            si.quantity,
+            si.price,
+            p.name AS productName,
+            (si.quantity * si.price) AS subtotal
+        FROM saleItens si
+                 JOIN products p ON p.id = si.productId
+        WHERE si.saleId = ?
+    `, [id]);
 
     return {
         ...sale,
-        items,
-    }
-}
+        items
+    };
+};
