@@ -6,7 +6,9 @@ exports.createSale = async (userId, subtotal, discount, total, paymentMethod, st
     if (!Array.isArray(products) || products.length < 1) {
         throw new Error(`Invalid products`);
     }
-    const [result] = await db.execute('INSERT INTO sales (userId, subtotal, discount, total, paymentMethod, status) VALUES (?,?,?,?,?,?)', [userId, subtotal, discount, total, paymentMethod, status])
+    const [result] = await db.execute(
+        'INSERT INTO sales (userId, subtotal, discount, total, paymentMethod, status) VALUES (?,?,?,?,?,?)',
+        [userId, subtotal, discount, total, paymentMethod, status])
     const saleId = result.insertId
 
     try{

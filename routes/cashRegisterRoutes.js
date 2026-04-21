@@ -4,5 +4,8 @@ const CRC = require('../controllers/cashRegisterController');
 const AT = require('../middlewares/authenticateToken')
 
 router.get('/', AT, CRC.getAllCashRegisters);
+router.post('/open', AT, CRC.openCashRegister);
+router.post('/:id', AT, CRC.closeCashRegister);
+
 
 module.exports = router;
