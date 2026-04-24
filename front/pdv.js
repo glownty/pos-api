@@ -322,6 +322,21 @@ function cancelSale() {
 }
 
 // =======================
+// FINISH SALE
+// =======================
+
+function finishSale() {
+    alert("Venda finalizada (mock)");
+}
+// =======================
+// AUTO SELECT
+// =======================
+
+function autoSelect(input) {
+    input.select();
+}
+
+// =======================
 // CLIENT
 // =======================
 function selectClient() {

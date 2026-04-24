@@ -87,7 +87,7 @@ function renderHomeView() {
                     </div>
                 </button>
 
-                <button onclick="navigate('cashRegister')" class="${UI.buttonSecondary}">
+                <button onclick="navigate('cashregister')" class="${UI.buttonSecondary}">
                     <div class="bg-gray-700/50 p-3 rounded-xl group-hover:bg-gray-600 group-hover:scale-110 transition-all duration-300 text-xl shadow-inner border border-gray-600/30">
                         🧾
                     </div>

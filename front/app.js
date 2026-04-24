@@ -22,28 +22,6 @@ function headers() {
 }
 
 // =======================
-// SIDEBAR
-// =======================
-let sidebarOpen = false;
-
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const menu = document.getElementById("menuItems");
-
-    sidebarOpen = !sidebarOpen;
-
-    if (sidebarOpen) {
-        sidebar.classList.remove("w-16");
-        sidebar.classList.add("w-64");
-        menu.classList.remove("hidden");
-    } else {
-        sidebar.classList.remove("w-64");
-        sidebar.classList.add("w-16");
-        menu.classList.add("hidden");
-    }
-}
-
-// =======================
 // NAVIGATION
 // =======================
 function navigate(view) {
@@ -68,6 +46,11 @@ function navigate(view) {
         container.innerHTML = renderSalesView();
         if (window.loadSales) loadSales();
     }
+
+    if (view === "cashregister") {
+        container.innerHTML = renderCashRegisterView();
+        if (window.loadCashRegister) loadCashRegister();
+    }
 }
 
 // =======================
@@ -78,11 +61,7 @@ function checkAuth() {
         document.getElementById("authView").classList.add("hidden");
         document.getElementById("appView").classList.remove("hidden");
 
-        // inicia na HOME
         navigate("home");
-
-        // fecha sidebar depois que renderizar
-        setTimeout(() => toggleSidebar(), 0);
     }
 }
 
@@ -100,8 +79,9 @@ function logout() {
 document.addEventListener("DOMContentLoaded", checkAuth);
 
 // =======================
-// EXPORT
+// EXPORT GLOBAL
 // =======================
 window.navigate = navigate;
-window.toggleSidebar = toggleSidebar;
 window.logout = logout;
+window.headers = headers;
+window.BASE_URL = BASE_URL;
