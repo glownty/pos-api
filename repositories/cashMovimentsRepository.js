@@ -14,3 +14,9 @@ exports.getMovementsByType = async (id, type) =>{
     )
     return result
 }
+exports.createMovement = async (userId, cashRegisterId, type, amount, description) =>{
+    const [result] = await db.execute(
+        'INSERT INTO cash_movements (cash_register_id, type, amount, description) VALUES (?,?,?,?) WHERE user_id = ?',
+        [cashRegisterId, type, amount, description, userId]
+    )
+}

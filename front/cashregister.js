@@ -5,10 +5,13 @@ const UI_CR = {
     card: "bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col",
     input: "bg-gray-900 border border-gray-700 text-white rounded-xl p-4 w-full focus:ring-2 focus:ring-blue-500 outline-none",
     buttonPrimary: "bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-bold text-white w-full",
-    buttonDanger: "bg-red-600 hover:bg-red-500 p-4 rounded-2xl font-bold text-white w-full"
+    buttonDanger: "bg-red-600 hover:bg-red-500 p-4 rounded-2xl font-bold text-white w-full",
+    buttonSmall: "bg-yellow-600 hover:bg-yellow-500 px-2 py-1 text-xs rounded-lg text-white"
 };
 
 let currentOpenRegisterId = null;
+let adjustmentTargetId = null;
+let adjustmentOldValue = 0;
 
 // =======================
 // ALERT BONITO
@@ -59,13 +62,11 @@ function renderCashRegisterView() {
     return `
         <div class="max-w-5xl mx-auto space-y-6 p-4">
 
-            <!-- HEADER -->
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold text-white">Caixa</h1>
                 <button onclick="navigate('home')">🏠</button>
             </div>
 
-            <!-- RESUMO -->
             <div class="grid grid-cols-3 gap-4">
                 <div class="${UI_CR.card} text-center">
                     <div class="text-gray-400 text-sm">Hoje</div>
@@ -81,24 +82,53 @@ function renderCashRegisterView() {
                 </div>
             </div>
 
-            <!-- FILTRO -->
             <div class="flex gap-2">
                 <button onclick="notImplemented()" class="bg-gray-700 px-3 py-1 rounded">Hoje</button>
                 <button onclick="notImplemented()" class="bg-gray-700 px-3 py-1 rounded">Semana</button>
                 <button onclick="notImplemented()" class="bg-gray-700 px-3 py-1 rounded">Mês</button>
             </div>
 
-            <!-- MAIN -->
             <div class="space-y-6">
 
-    <div id="cashregister-action-card" class="${UI_CR.card}"></div>
+                <div id="cashregister-action-card" class="${UI_CR.card}"></div>
 
-    <div class="${UI_CR.card}">
-        <h2 class="mb-4 text-lg font-semibold">🧾 Histórico</h2>
-        <div id="cashregister-history-list"></div>
-    </div>
+                <div class="${UI_CR.card}">
+                    <h2 class="mb-4 text-lg font-semibold">🧾 Histórico</h2>
+                    <div id="cashregister-history-list"></div>
+                </div>
 
-</div>
+            </div>
+        </div>
+
+        <!-- MODAL AJUSTE -->
+        <div id="adjustment-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-700 w-[90%] max-w-md">
+
+                <h2 class="text-white text-lg font-bold mb-2">Ajustar Caixa</h2>
+
+                <p class="text-gray-400 text-sm mb-2" id="adjustment-old-value"></p>
+
+                <input id="adjustment-input"
+                       type="number"
+                       class="${UI_CR.input} mb-4"
+                       placeholder="Novo valor final">
+
+                <input id="adjustment-desc"
+                       type="text"
+                       class="${UI_CR.input} mb-4"
+                       placeholder="Descrição obrigatória">
+
+                <div class="flex gap-2">
+                    <button onclick="confirmAdjustment()" class="${UI_CR.buttonPrimary}">
+                        Confirmar
+                    </button>
+
+                    <button onclick="closeAdjustmentModal()" class="${UI_CR.buttonDanger}">
+                        Cancelar
+                    </button>
+                </div>
+
+            </div>
         </div>
     `;
 }
@@ -145,9 +175,12 @@ function renderActionCard(openRegister) {
             <h2 class="text-white mb-2">🟢 Caixa Aberto</h2>
 
             <p class="text-gray-400">Inicial:</p>
-            <p class="text-white font-bold mb-4">R$ ${(Number(openRegister.initial_balance) || 0).toFixed(2)}</p>
+            <p class="text-white font-bold mb-4">
+                R$ ${(Number(openRegister.initial_balance) || 0).toFixed(2)}
+            </p>
 
-            <input id="input-final-balance" type="number" placeholder="Saldo final" class="${UI_CR.input}">
+            <input id="input-final-balance" type="number"
+                placeholder="Saldo final" class="${UI_CR.input}">
 
             <button onclick="closeCashRegister()" class="${UI_CR.buttonDanger} mt-4">
                 Fechar Caixa
@@ -157,7 +190,8 @@ function renderActionCard(openRegister) {
         el.innerHTML = `
             <h2 class="text-white mb-2">🔴 Caixa Fechado</h2>
 
-            <input id="input-initial-balance" type="number" placeholder="Saldo inicial" class="${UI_CR.input}">
+            <input id="input-initial-balance" type="number"
+                placeholder="Saldo inicial" class="${UI_CR.input}">
 
             <button onclick="openCashRegister()" class="${UI_CR.buttonPrimary} mt-4">
                 Abrir Caixa
@@ -172,7 +206,12 @@ function renderActionCard(openRegister) {
 function renderHistoryList(registers) {
     const el = document.getElementById("cashregister-history-list");
 
-    el.innerHTML = registers.map(r => `
+    el.innerHTML = registers.map(r => {
+
+        const adjusted = r.original_final_balance != null &&
+            r.original_final_balance !== r.final_balance;
+
+        return `
         <div class="border border-gray-700 p-4 mb-3 rounded-xl bg-gray-900">
 
             <div class="flex justify-between mb-2">
@@ -194,16 +233,39 @@ function renderHistoryList(registers) {
                 Inicial: <span class="text-white">R$ ${(Number(r.initial_balance) || 0).toFixed(2)}</span>
             </div>
 
-            <div class="text-gray-400 text-sm">
-                Final: ${
-        r.final_balance != null
-            ? `<span class="text-green-400">R$ ${Number(r.final_balance).toFixed(2)}</span>`
-            : '<span class="text-gray-500">---</span>'
-    }
+            <div class="text-gray-400 text-sm flex justify-between items-center mt-1">
+                <div>
+                    Final:
+                    <span class="${adjusted ? 'text-yellow-400' : 'text-green-400'}">
+                        ${
+            r.final_balance != null
+                ? `R$ ${Number(r.final_balance).toFixed(2)}`
+                : '---'
+        }
+                    </span>
+                </div>
+
+                ${
+            r.status !== 'OPEN'
+                ? `<button onclick="openAdjustment(${r.id}, ${r.final_balance || 0})"
+                        class="${UI_CR.buttonSmall}">
+                        Ajustar
+                    </button>`
+                : ''
+        }
             </div>
 
+            ${
+            adjusted
+                ? `<div class="text-xs text-yellow-400 mt-2">
+                        ⚠ Ajustado (anterior: R$ ${Number(r.original_final_balance).toFixed(2)})
+                       </div>`
+                : ''
+        }
+
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // =======================
@@ -257,6 +319,57 @@ async function closeCashRegister() {
             Math.abs(diff) < 0.01 ? "success" : "error"
         );
 
+        await fetchAndRenderRegisters();
+
+    } catch (err) {
+        showMessage(err.message, "error");
+    }
+}
+
+// =======================
+// ADJUSTMENT MODAL
+// =======================
+function openAdjustment(id, oldValue) {
+    adjustmentTargetId = id;
+    adjustmentOldValue = oldValue;
+
+    document.getElementById("adjustment-old-value").innerText =
+        `Valor atual: R$ ${Number(oldValue).toFixed(2)}`;
+
+    document.getElementById("adjustment-input").value = "";
+    document.getElementById("adjustment-desc").value = "";
+
+    document.getElementById("adjustment-modal").classList.remove("hidden");
+}
+
+function closeAdjustmentModal() {
+    document.getElementById("adjustment-modal").classList.add("hidden");
+}
+
+async function confirmAdjustment() {
+    const value = parseFloat(document.getElementById("adjustment-input").value);
+    const description = document.getElementById("adjustment-desc").value;
+
+    if (isNaN(value)) return showMessage("Valor inválido", "error");
+    if (!description || description.trim().length < 3)
+        return showMessage("Descrição obrigatória", "error");
+
+    try {
+        const res = await fetch(`${BASE_URL}/cashregister/${adjustmentTargetId}/adjustment`, {
+            method: "POST",
+            headers: headers(),
+            body: JSON.stringify({
+                amount: value,
+                description
+            })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "Erro no ajuste");
+
+        showMessage("Caixa ajustado com sucesso", "success");
+
+        closeAdjustmentModal();
         await fetchAndRenderRegisters();
 
     } catch (err) {

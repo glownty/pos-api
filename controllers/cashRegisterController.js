@@ -12,7 +12,18 @@ exports.getAllCashRegisters = async (req, res) => {
         });
     }
 }
+exports.createAdjustment = async (req, res) => {
+    const userId = req.user.id;
+    const cashRegisterId = req.params.id;
+    const {amount, description} = req.body;
 
+    try{
+        return res.json(await CRS.createAdjustment(userId, cashRegisterId, amount, description))
+    }catch (err){
+        res.status(500).send({error: err});
+    }
+
+}
 exports.openCashRegister = async (req, res) => {
     const {initialBalance} = req.body
     try{

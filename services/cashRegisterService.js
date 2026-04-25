@@ -7,6 +7,14 @@ exports.getAllCashRegisters = async (userId)=>{
     }
     return await CRR.getAllCashRegisters(userId);
 }
+exports.createAdjustment = async (userId, cashRegisterId, amount, description)=>{
+    if(!userId){throw new Error('Invalid user id.');}
+    if(!cashRegisterId){throw new Error('Invalid cash register id.');}
+    if(!amount){throw new Error('Invalid amount.');}
+    if(!description || description.length < 3){throw new Error('Invalid description.');}
+
+    return await CRR.createMovement(userId, cashRegisterId, "adjustment", amount, description);
+}
 
 exports.openCashRegister = async (userId, initialBalance)=>{
     if(!userId){
