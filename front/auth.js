@@ -20,20 +20,38 @@ document.addEventListener("DOMContentLoaded", () => {
 async function auth(e) {
     e.preventDefault();
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value;
+
+    // 🔥 garante string SEMPRE
+    password = String(password);
+
+    console.log("FRONT DEBUG:", { username, password, type: typeof password });
+
+    if (!username || !password) {
+        alert("Preencha username e password");
+        return;
+    }
 
     const route = isLogin ? "/auth/login" : "/auth/register";
 
     try {
         const res = await fetch(BASE_URL + route, {
             method: "POST",
-            headers: headers(),
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ username, password })
         });
 
         const data = await res.json();
-        console.log("AUTH:", data);
+
+        console.log("AUTH RESPONSE:", data);
+
+        if (!res.ok) {
+            alert(data.message || "Erro na requisição");
+            return;
+        }
 
         if (isLogin && data.token) {
             localStorage.setItem("token", data.token);
@@ -47,5 +65,6 @@ async function auth(e) {
 
     } catch (err) {
         console.error("AUTH ERROR:", err);
+        alert("Erro de conexão com servidor");
     }
 }

@@ -9,7 +9,7 @@ exports.register = async ({ username, password }) => {
         throw new AppError('Username and password is required', 400);
     }
     if (username.length < 4 ) {
-        throw new AppError('Username and password must be at least 4 characters');}
+        throw new AppError('Username must be at least 4 characters');}
     if (password.length < 8 ) {
         throw new AppError('Password must be at least 8 characters');
     }

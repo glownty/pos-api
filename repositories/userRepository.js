@@ -11,6 +11,7 @@
 
     exports.createUser = async (username, password) => {
 
+        console.log("PASSWORD DEBUG:", password, typeof password);
         const hashedPassword = await bcrypt.hash(password, 10);
 
 
