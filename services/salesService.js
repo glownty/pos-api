@@ -10,13 +10,21 @@ exports.createSale = async (
     status,
     products
 ) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
 
-    if (!userId || total == null) {
-        throw new AppError('userId and total are required');
+    if (total == null) {
+        throw new AppError('Total is required', 400, null, 'INVALID_TOTAL');
     }
 
     if (!Array.isArray(products) || products.length < 1) {
-        throw new AppError('Invalid products');
+        throw new AppError(
+            'Invalid products',
+            400,
+            { field: 'products', error: 'Must contain at least 1 item' },
+            'INVALID_PRODUCTS'
+        );
     }
 
     const saleId = await salesRepo.createSale(
@@ -34,18 +42,25 @@ exports.createSale = async (
 
 exports.getAllSales = async (userId) => {
     if (!userId) {
-        throw new AppError('userId is required');
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
     }
 
     return await salesRepo.getAllSales(userId);
 };
 
 exports.getSaleById = async (id, userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    if (!id) {
+        throw new AppError('Invalid sale id', 400, null, 'INVALID_SALE_ID');
+    }
 
     const sale = await salesRepo.getSaleById(id, userId);
 
     if (!sale) {
-        throw new AppError('Sale not found');
+        throw new AppError('Sale not found', 404, null, 'SALE_NOT_FOUND');
     }
 
     return sale;
@@ -60,13 +75,16 @@ exports.updateSale = async (
     paymentMethod,
     status
 ) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
 
-    if (!id || !userId) {
-        throw new AppError('id and userId are required');
+    if (!id) {
+        throw new AppError('Invalid sale id', 400, null, 'INVALID_SALE_ID');
     }
 
     if (total == null) {
-        throw new AppError('total is required');
+        throw new AppError('Total is required', 400, null, 'INVALID_TOTAL');
     }
 
     await salesRepo.updateSale(
@@ -83,10 +101,18 @@ exports.updateSale = async (
 };
 
 exports.deleteSale = async (id, userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    if (!id) {
+        throw new AppError('Invalid sale id', 400, null, 'INVALID_SALE_ID');
+    }
+
     const sale = await salesRepo.getSaleById(id, userId);
 
     if (!sale) {
-        throw new AppError('Sale not found');
+        throw new AppError('Sale not found', 404, null, 'SALE_NOT_FOUND');
     }
 
     await salesRepo.deleteSale(id, userId);

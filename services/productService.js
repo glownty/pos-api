@@ -13,11 +13,19 @@ exports.createProduct = async (data) => {
         isActive
     } = data;
 
-    if (!name || price == null) {
-        throw new AppError('name and price is required');
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
     }
 
-    // 🔥 AQUI É O FIX
+    if (!name || price == null) {
+        throw new AppError(
+            'name and price is required',
+            400,
+            null,
+            'VALIDATION_ERROR'
+        );
+    }
+
     barcode = barcode ?? null;
     cost = cost ?? 0;
     stock = stock ?? 0;
@@ -39,31 +47,59 @@ exports.createProduct = async (data) => {
 };
 
 exports.getAllProducts = async (userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
     return productRepo.getAllProducts(userId);
-}
+};
+
 exports.getProductById = async (id, userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    if (!id) {
+        throw new AppError('Invalid product id', 400, null, 'INVALID_PRODUCT_ID');
+    }
+
     return productRepo.getProductById(id, userId);
-}
+};
+
 exports.getProductByBarcode = async (barcode, userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    if (!barcode) {
+        throw new AppError('Invalid barcode', 400, null, 'INVALID_BARCODE');
+    }
+
     return productRepo.getProductByBarcode(barcode, userId);
-}
+};
+
 exports.getProductByName = async (name, userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
     if (!name || !name.trim()) {
         return [];
     }
-    if (!userId) {
-        throw new AppError('userId is invalid');
-    }
+
     const clean = name.trim();
 
     if (clean.length > 50) {
-        throw new AppError('search too long');
+        throw new AppError('Search too long', 400, null, 'SEARCH_TOO_LONG');
     }
+
     if (clean.length < 2) {
         return [];
     }
-    return productRepo.getProductByName(name, userId);
-}
+
+    return productRepo.getProductByName(clean, userId);
+};
+
 exports.updateProduct = async ({
                                    id,
                                    userId,
@@ -75,16 +111,33 @@ exports.updateProduct = async ({
                                    categoryId,
                                    isActive
                                }) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    if (!id) {
+        throw new AppError('Invalid product id', 400, null, 'INVALID_PRODUCT_ID');
+    }
 
     if (!name || price == null) {
-        throw new AppError('name and price is required');
+        throw new AppError(
+            'name and price is required',
+            400,
+            null,
+            'VALIDATION_ERROR'
+        );
     }
 
     if (barcode) {
         const existing = await productRepo.getProductByBarcode(barcode, userId);
 
         if (existing.length && existing[0].id != id) {
-            throw new AppError('barcode already exists');
+            throw new AppError(
+                'barcode already exists',
+                409,
+                null,
+                'BARCODE_ALREADY_EXISTS'
+            );
         }
     }
 
@@ -102,11 +155,23 @@ exports.updateProduct = async ({
 
     return await productRepo.getAllProducts(userId);
 };
+
 exports.deleteProduct = async (id, userId) => {
-    const product = await productRepo.getProductById(id, userId)
-    if(!product){
-        throw new AppError('product not found');
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
     }
+
+    if (!id) {
+        throw new AppError('Invalid product id', 400, null, 'INVALID_PRODUCT_ID');
+    }
+
+    const product = await productRepo.getProductById(id, userId);
+
+    if (!product) {
+        throw new AppError('Product not found', 404, null, 'PRODUCT_NOT_FOUND');
+    }
+
     await productRepo.deleteProduct(id, userId);
-    return productRepo.getAllProducts();
-}
+
+    return await productRepo.getAllProducts(userId);
+};

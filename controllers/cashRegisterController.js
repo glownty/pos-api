@@ -1,50 +1,62 @@
-﻿const CRS = require('../services/cashRegisterService')
+﻿const CRS = require('../services/cashRegisterService');
 
-exports.getAllCashRegisters = async (req, res) => {
-    try{
-        return res.json(await CRS.getAllCashRegisters(req.user.id))
-    }catch (err) {
-        console.error("❌ CASHREGISTER ERROR:", err);
-
-        res.status(500).json({
-            message: "Erro interno no servidor",
-            error: err.message || "Erro desconhecido"
-        });
-    }
-}
-exports.createAdjustment = async (req, res) => {
-    const userId = req.user.id;
-    const cashRegisterId = req.params.id;
-    const {amount, description} = req.body;
-
-    try{
-        return res.json(await CRS.createAdjustment(userId, cashRegisterId, amount, description))
-    }catch (err){
-        res.status(500).send({error: err});
-    }
-
-}
-exports.openCashRegister = async (req, res) => {
-    const {initialBalance} = req.body
-    try{
-        return res.json(await CRS.openCashRegister(req.user.id, initialBalance))
-    }catch (err){
-        res.status(500).send({error: err});
-    }
-}
-exports.closeCashRegister = async (req, res) => {
-    const { finalBalance } = req.body
-    const id = req.params.id
-    const userId = req.user.id
+exports.getAllCashRegisters = async (req, res, next) => {
     try {
-        return res.json(await CRS.closeCashRegister(finalBalance, userId, id))
-    }catch (err) {
-        console.error("❌ CLOSE CASH ERROR:");
-        console.error("Message:", err.message);
-        console.error("Stack:", err.stack);
-
-        res.status(500).json({
-            message: err.message || "Erro interno no servidor"
-        });
+        const result = await CRS.getAllCashRegisters(req.user.id);
+        return res.json(result);
+    } catch (err) {
+        next(err);
     }
-}
+};
+
+exports.createAdjustment = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const cashRegisterId = req.params.id;
+        const { amount, description } = req.body;
+
+        const result = await CRS.createAdjustment(
+            userId,
+            cashRegisterId,
+            amount,
+            description
+        );
+
+        return res.json(result);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.openCashRegister = async (req, res, next) => {
+    try {
+        const { initialBalance } = req.body;
+
+        const result = await CRS.openCashRegister(
+            req.user.id,
+            initialBalance
+        );
+
+        return res.json(result);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.closeCashRegister = async (req, res, next) => {
+    try {
+        const { finalBalance } = req.body;
+        const id = req.params.id;
+        const userId = req.user.id;
+
+        const result = await CRS.closeCashRegister(
+            finalBalance,
+            userId,
+            id
+        );
+
+        return res.json(result);
+    } catch (err) {
+        next(err);
+    }
+};

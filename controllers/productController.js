@@ -1,120 +1,91 @@
 ﻿const productService = require('../services/productService');
 
-exports.getAllProducts = async (req,res) => {
+exports.getAllProducts = async (req, res, next) => {
     try {
-        return res.json( await productService.getAllProducts(req.user.id));
-    }catch (err){
-        res.status(400).send({error: err});
+        const result = await productService.getAllProducts(req.user.id);
+        return res.json(result);
+    } catch (err) {
+        next(err);
     }
-}
+};
 
-exports.getProductByBarcode = async (req,res) => {
-    const barcode = req.params.code;
-    const userId = req.user.id;
+exports.getProductByBarcode = async (req, res, next) => {
+    try {
+        const barcode = req.params.code;
+        const userId = req.user.id;
 
-    if (!barcode) {
-        return res.status(400).send({error: 'invalid barcode '});
-    }
-    try{
         const result = await productService.getProductByBarcode(barcode, userId);
-        return res.json(result)
-    }catch (err) {
-        console.error("🔥 CREATE PRODUCT ERROR:", err);
-        return res.status(500).json({
-            msg: "Server error",
-            error: err.message
-        });
+        return res.json(result);
+    } catch (err) {
+        next(err);
     }
-}
+};
 
-exports.getProductByName = async (req,res) => {
-    const name = req.query.name
-    const userId = req.user.id;
+exports.getProductByName = async (req, res, next) => {
+    try {
+        const name = req.query.name;
+        const userId = req.user.id;
 
-    try{
         const result = await productService.getProductByName(name, userId);
-        return res.json(result)
-    }catch (err) {
-        console.error("search product error:", err);
-        return res.status(500).json({
-            msg: "Server error",
-            error: err.message
-        });
+        return res.json(result);
+    } catch (err) {
+        next(err);
     }
-}
+};
 
-exports.getProductById = async (req,res) => {
-    const id = req.params.id
-    const userId = req.user.id;
-    try{
+exports.getProductById = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const userId = req.user.id;
+
         const result = await productService.getProductById(id, userId);
-        return res.json(result)
-    }catch (err) {
-        console.error("search product error:", err);
-        return res.status(500).json({
-            msg: "Server error",
-            error: err.message
-        });
+        return res.json(result);
+    } catch (err) {
+        next(err);
     }
-}
-exports.createProduct = async (req, res) => {
-    const {
-        name, barcode, price, cost, stock, categoryId, isActive,
-    } = req.body;
+};
 
-    const userId = req.user.id;
+exports.createProduct = async (req, res, next) => {
     try {
+        const userId = req.user.id;
+
         const result = await productService.createProduct({
-            userId, name, barcode, price, cost, stock, categoryId, isActive,
+            userId,
+            ...req.body
         });
+
         return res.json(result);
-    }catch (err) {
-        console.error("🔥 CREATE PRODUCT ERROR:", err);
-        return res.status(500).json({
-            msg: "Server error",
-            error: err.message
-        });
+    } catch (err) {
+        next(err);
     }
-}
-exports.updateProduct = async (req, res) => {
-    const {
-        name, barcode, price, cost, stock, categoryId, isActive,
-    } = req.body;
-    const id = req.params.id;
-    const userId = req.user.id;
+};
+
+exports.updateProduct = async (req, res, next) => {
     try {
-        const result = await productService.updateProduct({id, userId, name, barcode, price, cost, stock, categoryId, isActive,})
+        const id = req.params.id;
+        const userId = req.user.id;
+
+        const result = await productService.updateProduct({
+            id,
+            userId,
+            ...req.body
+        });
+
         return res.json(result);
-    }catch (err) {
-        console.error("🔥 PRODUCT ERROR:", err);
-
-        return res.status(500).json({
-            message: "Internal server error",
-            error: err.message,
-            stack: process.env.NODE_ENV === "development" ? err.stack : undefined
-        });
+    } catch (err) {
+        next(err);
     }
-}
+};
 
-exports.deleteProduct = async (req, res) => {
-    const {id} = req.params;
-    const userId = req.user.id;
-    if (!id) {
-        return res.status(404).send({error: 'product not found'});
-    }
-    if (!userId) {
-        return res.status(400).send({error: 'undefined userId'});
-    }
-
+exports.deleteProduct = async (req, res, next) => {
     try {
-        await productService.deleteProduct(id, req.user.id);
-    }catch (err) {
-        console.error("🔥 ERROR:", err);
+        const id = req.params.id;
+        const userId = req.user.id;
 
-        return res.status(500).json({
-            msg: "Server error",
-            error: err.message,
-            stack: err.stack // pode remover depois
-        });
+        await productService.deleteProduct(id, userId);
+
+        return res.json({ success: true });
+    } catch (err) {
+        next(err);
     }
-}
+};
