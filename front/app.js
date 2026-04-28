@@ -48,8 +48,7 @@ function navigate(view) {
     }
 
     if (view === "cashregister") {
-        container.innerHTML = renderCashRegisterView();
-        if (window.loadCashRegister) loadCashRegister();
+        loadCashRegisterView();
     }
 }
 
@@ -63,6 +62,18 @@ function checkAuth() {
 
         navigate("home");
     }
+}
+
+async function loadCashRegisterView() {
+    const container = document.getElementById("viewContainer");
+
+    const res = await fetch("/views/cashRegister.html");
+    const html = await res.text();
+
+    container.innerHTML = html;
+
+    const module = await import("/scripts/cashRegister.js");
+    module.init();
 }
 
 // =======================

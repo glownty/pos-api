@@ -9,6 +9,25 @@ exports.getAllCashRegisters = async (userId) => {
 
     return await CRR.getAllCashRegisters(userId);
 };
+exports.getCashRegister = async (userId, page = 1, limit = 10) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+    const p = Number(page) || 1;
+    const l = Number(limit) || 10;
+
+    const offset = (p - 1) * l;;
+
+    const data = await CRR.getCashRegister(userId, limit, offset)
+    const total  = await CRR.countCashRegister(userId)
+
+    return{
+        data,
+        page,
+        limit,
+        total
+    }
+}
 
 exports.createAdjustment = async (userId, cashRegisterId, amount, description) => {
     if (!userId) {
