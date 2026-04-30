@@ -55,6 +55,20 @@ exports.countCashRegister = async (userId) => {
     return rows[0].total;
 };
 
+exports.getCashRegisterStatus = async (userId) => {
+    const [rows] = await db.execute(
+        `SELECT status FROM cash_register
+             WHERE user_id = ?
+             ORDER BY id DESC
+             LIMIT 1 OFFSET 0`,
+             [userId]
+    )
+    
+    return rows[0]?.status || null
+
+}
+
+
 exports.openCashRegister = async (userId, initialBalance) => {
     const [result] = await db.execute(
         'INSERT INTO cash_register (user_id, initial_balance) VALUES (?, ?)',
