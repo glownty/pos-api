@@ -38,8 +38,7 @@ function navigate(view) {
     }
 
     if (view === "pdv") {
-        container.innerHTML = renderPDVView();
-        if (window.loadPDVProducts) loadPDVProducts();
+        loadPDVView();
     }
 
     if (view === "sales") {
@@ -74,6 +73,18 @@ async function loadCashRegisterView() {
 
     const module = await import("/scripts/cashRegister.js");
     module.init();
+}
+
+async function loadPDVView() {
+    const container = document.getElementById("viewContainer");
+
+    const res = await fetch("/views/pdv.html");
+    const html = await res.text();
+
+    container.innerHTML = html;
+
+    // 👇 AGORA sim pode renderizar
+    renderCart();
 }
 
 // =======================
