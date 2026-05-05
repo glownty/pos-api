@@ -28,6 +28,24 @@ exports.getCashRegister = async (userId, page = 1, limit = 10) => {
         total
     }
 }
+exports.getCashRegisterStatus = async (userId) => {
+    if (!userId) {
+        throw new AppError('Invalid user id', 400, null, 'INVALID_USER_ID');
+    }
+
+    const status = await CRR.getCashRegisterStatus(userId);
+
+    if (!status) {
+        throw new AppError(
+            'Failed to retrieve cash register status',
+            500,
+            null,
+            'CASH_REGISTER_STATUS_ERROR'
+        );
+    }
+
+    return status;
+};
 
 exports.createAdjustment = async (userId, cashRegisterId, amount, description) => {
     if (!userId) {

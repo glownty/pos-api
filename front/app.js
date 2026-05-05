@@ -22,32 +22,48 @@ function headers() {
 }
 
 // =======================
-// NAVIGATION
+// NAVIGATION (PADRÃO NOVO)
 // =======================
-function navigate(view) {
+async function navigate(view) {
+
+    // 🔥 MIDDLEWARE GLOBAL
+    if (view === "pdv") {
+        try {
+            const { ensureCashRegisterOpen } = await import("/middlewares/ensureCashRegisterOpen.js");
+
+            const allowed = await ensureCashRegisterOpen();
+            if (!allowed) return;
+
+        } catch (e) {
+            console.error("Erro no middleware:", e);
+            return;
+        }
+    }
+
     const container = document.getElementById("viewContainer");
 
-    if (view === "home") {
-        container.innerHTML = renderHomeView();
-        if (window.loadHome) loadHome();
-    }
+    try {
+        // carrega HTML
+        const res = await fetch(`/views/${view}.html`);
+        const html = await res.text();
 
-    if (view === "products") {
-        container.innerHTML = renderProductsView();
-        if (window.loadProducts) loadProducts();
-    }
+        container.innerHTML = html;
 
-    if (view === "pdv") {
-        loadPDVView();
-    }
+        // carrega script da página (se existir)
+        try {
+            const module = await import(`/scripts/${view}.js`);
 
-    if (view === "sales") {
-        container.innerHTML = renderSalesView();
-        if (window.loadSales) loadSales();
-    }
+            // padrão único
+            if (module.load) module.load();
+            if (module.init) module.init();
 
-    if (view === "cashregister") {
-        loadCashRegisterView();
+        } catch (e) {
+            // página pode não ter script
+        }
+
+    } catch (err) {
+        console.error("Erro ao carregar view:", err);
+        container.innerHTML = "<p>Erro ao carregar página</p>";
     }
 }
 
@@ -61,30 +77,6 @@ function checkAuth() {
 
         navigate("home");
     }
-}
-
-async function loadCashRegisterView() {
-    const container = document.getElementById("viewContainer");
-
-    const res = await fetch("/views/cashRegister.html");
-    const html = await res.text();
-
-    container.innerHTML = html;
-
-    const module = await import("/scripts/cashRegister.js");
-    module.init();
-}
-
-async function loadPDVView() {
-    const container = document.getElementById("viewContainer");
-
-    const res = await fetch("/views/pdv.html");
-    const html = await res.text();
-
-    container.innerHTML = html;
-
-    // 👇 AGORA sim pode renderizar
-    renderCart();
 }
 
 // =======================

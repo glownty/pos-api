@@ -35,23 +35,21 @@
 <!-- APP -->
 <div id="appView" class="hidden flex h-screen">
 
-
     <!-- CONTENT -->
     <div class="flex-1 p-4 overflow-auto">
         <div id="viewContainer">
-            <!-- JS vai renderizar aqui -->
+            <!-- app.js vai carregar HTML aqui -->
         </div>
     </div>
 
 </div>
 
-<!-- SCRIPTS (ORDEM IMPORTA) -->
-<script src="home.js"></script>
+<!-- SCRIPTS -->
 <script type="module" src="app.js"></script>
 <script src="auth.js"></script>
 <script src="products.js"></script>
-<script src="/services/pdvService.js"></script> <!-- 👈 -->
-<script src="/scripts/pdv.js"></script>        <!-- 👈 -->
+<script src="/services/pdvService.js"></script>
+<script src="/scripts/pdv.js"></script>
 <script src="sales.js"></script>
 
 <!-- MODAL CRIAR PRODUTO -->

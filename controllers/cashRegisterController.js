@@ -33,7 +33,14 @@ exports.getCashRegister = async (req, res, next) => {
         next(err);
     }
 }
-
+exports.getCashRegisterStatus = async (req, res, next) => {
+    try{
+        const result = await CRS.getCashRegisterStatus(req.user.id)
+        return res.json(result);
+    }catch (err){
+        next(err)
+    }
+}
 exports.createAdjustment = async (req, res, next) => {
     try {
         const userId = req.user.id;
