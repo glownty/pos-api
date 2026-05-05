@@ -26,16 +26,24 @@ function headers() {
 // =======================
 async function navigate(view) {
 
-    // 🔥 MIDDLEWARE GLOBAL
+    // 🔥 VALIDAÇÃO REAL (via API, sem middleware import)
     if (view === "pdv") {
         try {
-            const { ensureCashRegisterOpen } = await import("/middlewares/ensureCashRegisterOpen.js");
+            const res = await fetch("/cashRegister/status", {
+                headers: {
+                    Authorization: token
+                }
+            });
 
-            const allowed = await ensureCashRegisterOpen();
-            if (!allowed) return;
+            const data = await res.json();
+
+            if (data?.trim().toUpperCase() !== "OPEN") {
+                showMessage?.("Abra o caixa primeiro");
+                return;
+            }
 
         } catch (e) {
-            console.error("Erro no middleware:", e);
+            console.error("Erro ao verificar caixa:", e);
             return;
         }
     }
@@ -53,7 +61,6 @@ async function navigate(view) {
         try {
             const module = await import(`/scripts/${view}.js`);
 
-            // padrão único
             if (module.load) module.load();
             if (module.init) module.init();
 

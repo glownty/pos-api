@@ -1,5 +1,4 @@
-import { getHomeData } from "../services/homeService";
-import { ensureCashRegisterOpen } from "../../middlewares/ensureCashRegisterOpen";
+import { getHomeData } from "../services/homeService.js";
 
 export function loadHome() {
     console.log("Home carregada ✨");
@@ -10,17 +9,43 @@ export function loadHome() {
     document.getElementById("ticketMedio").innerText = data.ticketMedio;
 }
 
-// 🔥 aqui está o controle real
-export function goToPDV() {
-    const allowed = ensureCashRegisterOpen();
+// 🔥 valida via backend (correto)
+export async function goToPDV() {
+    try {
+        const res = await fetch("/cashRegister/status", {
+            headers: {
+                Authorization: localStorage.getItem("token")
+            }
+        });
 
-    if (!allowed) return;
+        const data = await res.json();
 
-    navigate("pdv");
+        if (data?.trim().toUpperCase() !== "OPEN") {
+            showMessage("Abra o caixa primeiro");
+            return;
+        }
+
+        navigate("pdv");
+
+    } catch (err) {
+        console.error("Erro ao verificar status do caixa:", err);
+        alert("Erro ao verificar o caixa");
+    }
 }
 
 export function openSettings() {
     alert("Configurações (em construção)");
+}
+
+function showMessage(msg) {
+    const el = document.getElementById("feedback");
+
+    el.innerText = msg;
+    el.classList.remove("hidden");
+
+    setTimeout(() => {
+        el.classList.add("hidden");
+    }, 3000);
 }
 
 // global (por causa do HTML)
