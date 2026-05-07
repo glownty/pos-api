@@ -3,6 +3,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productsRoutes');
 const salesRoutes = require('./routes/salesRoutes');
 const cashRegisterRoutes = require('./routes/cashRegisterRoutes');
+const clientsRoutes = require('./routes/clientsRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const path = require('path');
 
@@ -18,6 +19,7 @@ app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/sales', salesRoutes);
 app.use('/cashRegister', cashRegisterRoutes);
+app.use('/clients', clientsRoutes);
 
 app.use(express.static(path.join(__dirname, 'front')));
 
