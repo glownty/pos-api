@@ -19,6 +19,7 @@ export async function goToPDV() {
         });
 
         const data = await res.json();
+        console.log(data);
 
         if (data?.trim().toUpperCase() !== "OPEN") {
             showMessage("Abra o caixa primeiro");

@@ -4,5 +4,6 @@ const AT = require('../middlewares/authenticateToken')
 const CC = require('../controllers/clientsController')
 
 router.get('/', AT, CC.getAllClients)
+router.post('/', AT, CC.createClient)
 
 module.exports = router

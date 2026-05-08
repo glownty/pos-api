@@ -8,7 +8,8 @@ let token = localStorage.getItem("token");
 window.state = {
     products: [],
     pdvProducts: [],
-    sales: []
+    sales: [],
+    clients: []
 };
 
 // =======================
@@ -22,13 +23,15 @@ function headers() {
 }
 
 // =======================
-// NAVIGATION (PADRÃO NOVO)
+// NAVIGATION
 // =======================
 async function navigate(view) {
 
-    // 🔥 VALIDAÇÃO REAL (via API, sem middleware import)
+    // 🔥 VALIDAÇÃO REAL (CAIXA)
     if (view === "pdv") {
+
         try {
+
             const res = await fetch("/cashRegister/status", {
                 headers: {
                     Authorization: token
@@ -37,13 +40,29 @@ async function navigate(view) {
 
             const data = await res.json();
 
+            console.log("STATUS:", data);
+
+            // 🔥 AQUI ESTAVA O ERRO
+            // a API retorna STRING ("OPEN")
+            // e não objeto { status: "OPEN" }
+
             if (data?.trim().toUpperCase() !== "OPEN") {
-                showMessage?.("Abra o caixa primeiro");
+
+                if (window.showMessage) {
+                    showMessage("Abra o caixa primeiro");
+                } else {
+                    alert("Abra o caixa primeiro");
+                }
+
                 return;
             }
 
         } catch (e) {
+
             console.error("Erro ao verificar caixa:", e);
+
+            alert("Erro ao verificar status do caixa");
+
             return;
         }
     }
@@ -51,26 +70,41 @@ async function navigate(view) {
     const container = document.getElementById("viewContainer");
 
     try {
-        // carrega HTML
+
+        // =======================
+        // LOAD HTML
+        // =======================
         const res = await fetch(`/views/${view}.html`);
+
         const html = await res.text();
 
         container.innerHTML = html;
 
-        // carrega script da página (se existir)
+        // =======================
+        // LOAD SCRIPT
+        // =======================
         try {
+
             const module = await import(`/scripts/${view}.js`);
 
             if (module.load) module.load();
+
             if (module.init) module.init();
 
         } catch (e) {
-            // página pode não ter script
+
+            // página pode não possuir JS
         }
 
     } catch (err) {
+
         console.error("Erro ao carregar view:", err);
-        container.innerHTML = "<p>Erro ao carregar página</p>";
+
+        container.innerHTML = `
+            <div class="text-red-400 p-5">
+                Erro ao carregar página
+            </div>
+        `;
     }
 }
 
@@ -78,9 +112,18 @@ async function navigate(view) {
 // AUTH CHECK
 // =======================
 function checkAuth() {
+
     if (token) {
-        document.getElementById("authView").classList.add("hidden");
-        document.getElementById("appView").classList.remove("hidden");
+
+        document
+            .getElementById("authView")
+            .classList
+            .add("hidden");
+
+        document
+            .getElementById("appView")
+            .classList
+            .remove("hidden");
 
         navigate("home");
     }
@@ -90,7 +133,9 @@ function checkAuth() {
 // LOGOUT
 // =======================
 function logout() {
+
     localStorage.removeItem("token");
+
     location.reload();
 }
 

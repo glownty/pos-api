@@ -1,0 +1,38 @@
+<div>
+
+    <h1 class="text-xl font-bold mb-4">
+        Produtos
+    </h1>
+
+    <div class="flex gap-2 mb-4">
+
+        <button
+            onclick="openCreateProduct()"
+            class="bg-green-600 px-3 rounded"
+        >
+            + Adicionar Produto
+        </button>
+
+        <input
+            id="searchInput"
+            oninput="handleSearchInput()"
+            class="
+                flex-1
+                p-2
+                bg-gray-800
+                rounded
+                outline-none
+                focus:ring-2
+                focus:ring-blue-500
+            "
+            placeholder="Pesquisar produto..."
+        >
+
+    </div>
+
+    <div
+        id="productsList"
+        class="space-y-2"
+    ></div>
+
+</div>

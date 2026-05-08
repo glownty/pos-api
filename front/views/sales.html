@@ -1,0 +1,70 @@
+<div>
+
+    <h1 class="text-xl font-bold mb-4">
+        Vendas
+    </h1>
+
+    <div class="flex gap-2 mb-4">
+
+        <input
+            id="salesSearchInput"
+            oninput="handleSalesSearchInput()"
+            class="
+                flex-1
+                p-2
+                bg-gray-800
+                rounded
+                outline-none
+                focus:ring-2
+                focus:ring-blue-500
+            "
+            placeholder="Buscar venda por ID..."
+        >
+
+    </div>
+
+    <div
+        id="salesList"
+        class="space-y-2"
+    ></div>
+
+</div>
+
+<!-- MODAL -->
+<div
+    id="saleModal"
+    class="
+        hidden
+        fixed
+        inset-0
+        bg-black
+        bg-opacity-70
+        flex
+        items-center
+        justify-center
+        z-50
+    "
+>
+
+    <div class="bg-gray-900 w-full max-w-md p-4 rounded">
+
+        <div class="flex justify-between items-center mb-4">
+
+            <h2 class="text-lg font-bold">
+                Detalhe da Venda
+            </h2>
+
+            <button
+                onclick="closeSaleModal()"
+                class="text-red-500"
+            >
+                X
+            </button>
+
+        </div>
+
+        <div id="saleModalContent"></div>
+
+    </div>
+
+</div>

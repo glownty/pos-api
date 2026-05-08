@@ -1,0 +1,60 @@
+<div class="max-w-6xl mx-auto space-y-8 p-4">
+                class="text-gray-400 hover:text-white text-xl"
+            >
+                ✕
+            </button>
+        </div>
+
+        <div class="space-y-4">
+
+            <input
+                id="cc_name"
+                type="text"
+                placeholder="Nome do cliente"
+                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            >
+
+            <input
+                id="cc_phone"
+                type="text"
+                placeholder="Telefone"
+                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            >
+
+            <input
+                id="cc_cpf"
+                type="text"
+                placeholder="CPF (opcional)"
+                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            >
+
+            <input
+                id="cc_credit_limit"
+                type="number"
+                placeholder="Limite de crédito"
+                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            >
+
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+
+            <button
+                onclick="closeCreateClientModal()"
+                class="px-5 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 transition-all"
+            >
+                Cancelar
+            </button>
+
+            <button
+                onclick="submitCreateClient()"
+                class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 transition-all font-semibold"
+            >
+                Salvar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
