@@ -165,6 +165,19 @@ function selectClient() {
     document.body.appendChild(modal);
 }
 
+// =======================
+// F5 -> HOME
+// =======================
+window.addEventListener("keydown", (e) => {
+
+    if (e.key === "F5") {
+
+        e.preventDefault();
+
+        navigate("home");
+    }
+});
+
 // RESTORE VIEW
 window.addEventListener("load", () => {
     const view = localStorage.getItem("activeView");
@@ -172,6 +185,8 @@ window.addEventListener("load", () => {
     if (view === "products") renderProductsView();
     if (view === "sales") renderSalesView();
 });
+
+
 // EXPORT
 window.handlePDVSearch = handlePDVSearch;
 window.pushCart = pushCart;

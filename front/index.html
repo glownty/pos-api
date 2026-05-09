@@ -107,17 +107,6 @@
 
             </div>
 
-            <button
-                onclick="toggleSidebar()"
-                class="
-                    text-gray-400
-                    hover:text-white
-                    text-xl
-                    transition-all
-                "
-            >
-                ☰
-            </button>
 
         </div>
 
@@ -552,6 +541,41 @@
 
     </div>
 
+</div>
+
+<!-- MODAL CRIAR CLIENTE -->
+<div id="createClientModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-gray-800 w-[420px] p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Novo Cliente</h2>
+        <div class="space-y-3">
+            <input id="cc_name" class="w-full p-2 bg-gray-700 rounded" placeholder="Nome do cliente">
+            <input id="cc_cpf" class="w-full p-2 bg-gray-700 rounded" placeholder="CPF">
+            <input id="cc_phone" class="w-full p-2 bg-gray-700 rounded" placeholder="Telefone">
+            <input id="cc_credit_limit" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Limite de Crédito">
+        </div>
+        <div class="flex justify-between mt-5">
+            <button onclick="closeCreateClientModal()" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 transition-all">Cancelar</button>
+            <button onclick="submitCreateClient()" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition-all">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR CLIENTE -->
+<div id="editClientModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-gray-800 w-[420px] p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Editar Cliente</h2>
+        <input id="ec_id" type="hidden">
+        <div class="space-y-3">
+            <input id="ec_name" class="w-full p-2 bg-gray-700 rounded" placeholder="Nome">
+            <input id="ec_cpf" class="w-full p-2 bg-gray-700 rounded" placeholder="CPF">
+            <input id="ec_phone" class="w-full p-2 bg-gray-700 rounded" placeholder="Telefone">
+            <input id="ec_credit_limit" type="number" class="w-full p-2 bg-gray-700 rounded" placeholder="Limite de Crédito">
+        </div>
+        <div class="flex justify-between mt-5">
+            <button onclick="closeEditClientModal()" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 transition-all">Cancelar</button>
+            <button onclick="submitEditClient()" class="px-4 py-2 bg-green-600 rounded hover:bg-green-500 transition-all">Atualizar</button>
+        </div>
+    </div>
 </div>
 
 </body>

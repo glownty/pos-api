@@ -1,60 +1,87 @@
-<div class="max-w-6xl mx-auto space-y-8 p-4">
-                class="text-gray-400 hover:text-white text-xl"
-            >
-                ✕
-            </button>
+<div class="relative text-white">
+
+    <h1 class="text-xl font-bold mb-4">
+        Clientes
+    </h1>
+
+    <div class="flex gap-2 mb-4">
+        <button
+            onclick="openCreateClient()"
+            class="bg-green-600 px-3 py-2 rounded hover:bg-green-500 font-semibold"
+        >
+            + Adicionar Cliente
+        </button>
+
+        <input
+            id="searchInput"
+            oninput="handleSearchInput()"
+            class="flex-1 p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Pesquisar cliente (Nome ou CPF)..."
+        >
+    </div>
+
+    <div id="clientsList" class="space-y-2"></div>
+
+    <div id="createClientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-xl">
+            <h2 class="text-lg font-bold mb-4">Novo Cliente</h2>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Nome</label>
+                    <input id="cc_name" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">CPF</label>
+                    <input id="cc_cpf" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Telefone</label>
+                    <input id="cc_phone" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Limite de Crédito (R$)</label>
+                    <input id="cc_credit_limit" type="number" step="0.01" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeCreateClientModal()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500">Cancelar</button>
+                <button onclick="submitCreateClient()" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500">Salvar</button>
+            </div>
         </div>
+    </div>
 
-        <div class="space-y-4">
+    <div id="editClientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-xl">
+            <h2 class="text-lg font-bold mb-4">Editar Cliente</h2>
+            
+            <input type="hidden" id="ec_id">
 
-            <input
-                id="cc_name"
-                type="text"
-                placeholder="Nome do cliente"
-                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-            >
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Nome</label>
+                    <input id="ec_name" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">CPF</label>
+                    <input id="ec_cpf" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Telefone</label>
+                    <input id="ec_phone" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Limite de Crédito (R$)</label>
+                    <input id="ec_credit_limit" type="number" step="0.01" class="w-full p-2 bg-gray-800 rounded outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
 
-            <input
-                id="cc_phone"
-                type="text"
-                placeholder="Telefone"
-                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-            >
-
-            <input
-                id="cc_cpf"
-                type="text"
-                placeholder="CPF (opcional)"
-                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-            >
-
-            <input
-                id="cc_credit_limit"
-                type="number"
-                placeholder="Limite de crédito"
-                class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-            >
-
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeEditClientModal()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500">Cancelar</button>
+                <button onclick="submitEditClient()" class="bg-yellow-600 px-4 py-2 rounded hover:bg-yellow-500 text-white">Atualizar</button>
+            </div>
         </div>
-
-        <div class="flex justify-end gap-3 mt-6">
-
-            <button
-                onclick="closeCreateClientModal()"
-                class="px-5 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 transition-all"
-            >
-                Cancelar
-            </button>
-
-            <button
-                onclick="submitCreateClient()"
-                class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 transition-all font-semibold"
-            >
-                Salvar
-            </button>
-
-        </div>
-
     </div>
 
 </div>
