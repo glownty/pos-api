@@ -25,7 +25,7 @@ exports.getCashRegisterById = async (id, userId) => {
     return rows[0];
 }
 
-    exports.getCashRegister = async (userId, limit, offset) => {
+exports.getCashRegister = async (userId, limit, offset) => {
         const safeLimit = Number(limit);
         const safeOffset = Number(offset);
         const safeUserId = Number(userId);
@@ -40,10 +40,9 @@ exports.getCashRegisterById = async (id, userId) => {
                  LIMIT ${safeLimit} OFFSET ${safeOffset}`,
             [safeUserId]
         );
-        console.log("ROWS RETURNED:", rows.length);
 
         return rows;
-    };
+};
 exports.countCashRegister = async (userId) => {
     const [rows] = await db.execute(
         `SELECT COUNT(*) as total 

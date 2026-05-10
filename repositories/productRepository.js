@@ -22,7 +22,6 @@ exports.updateProduct = async (id, userId, name, barcode, price, cost, stock, ca
     );
 }
 exports.deleteProduct = async (id, userId) => {
-    console.log("🧨 DELETE PARAMS:", { id, userId });
     await db.execute(`DELETE FROM products WHERE id = ? AND userId = ?`, [id, userId]);
     return {msg: 'Deleted product'};
 }
