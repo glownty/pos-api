@@ -17,6 +17,17 @@ exports.deleteClient = async (clientId, userId) => {
     return result
 }
 
+exports.countClients = async (userId) => {
+    const [rows] = await db.execute(
+        `SELECT COUNT(*) as total 
+         FROM clients
+         WHERE user_id = ?`,
+        [userId]
+    );
+
+    return rows[0].total;
+};
+
 //=======================================================
 //                  UPDATE FUNCTIONS
 //=======================================================
@@ -101,3 +112,4 @@ exports.getClientByName = async (userId, name) => {
     )
     return rows
 }
+
