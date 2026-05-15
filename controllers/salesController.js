@@ -28,8 +28,8 @@ exports.createSale = async (req, res, next) => {
 
         const {
             subtotal,
-            discount = 0,
-            paymentMethod = "cash",
+            discount = 0, 
+            paymentMethod = "cash", 
             status = "completed",
             products
         } = req.body;

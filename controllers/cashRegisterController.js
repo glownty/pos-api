@@ -10,18 +10,17 @@ exports.getAllCashRegisters = async (req, res, next) => {
 };
 
 exports.getCashRegister = async (req, res, next) => {
+    const userId = req.user.id;
+    let { page, limit } = req.query;
+
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+
+    if (page <= 0) {page = 1}
+    if (limit <= 0) {limit = 10}
+    if (limit > 100) {limit = 100}
+
     try {
-        const userId = req.user.id;
-
-        let { page, limit } = req.query;
-
-        page = Number(page) || 1;
-        limit = Number(limit) || 10;
-
-        if (page <= 0) {page = 1}
-        if (limit <= 0) {limit = 10}
-        if (limit > 100) {limit = 100}
-
         const result = await CRS.getCashRegister(
             userId,
             page,

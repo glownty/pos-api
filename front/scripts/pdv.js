@@ -165,19 +165,6 @@ function selectClient() {
     document.body.appendChild(modal);
 }
 
-// =======================
-// F5 -> HOME
-// =======================
-window.addEventListener("keydown", (e) => {
-
-    if (e.key === "F5") {
-
-        e.preventDefault();
-
-        navigate("home");
-    }
-});
-
 // RESTORE VIEW
 window.addEventListener("load", () => {
     const view = localStorage.getItem("activeView");
